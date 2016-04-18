@@ -128,6 +128,14 @@ $(document).ready(function () {
 </ul>
 </div>
 
+<p>This exercise walks through the process of extracting the R “flights”&quot; database that was preloaded into Postgres, tranforming the data in R and loading the data into MongoDB. The transformation process had performance limitions on a Mac laptop running OSX with the flights table that contained 300K rows.</p>
+<p>The principal disadvantage encountered in using NoSQL was conversion to and from the BSON object structure into a workable form in R.</p>
+<p>The principal advantages of NoSQL include being able to handle:</p>
+<pre><code>Large volumes of structured, semi-structured, and unstructured data.
+Agile sprints, quick iteration, and frequent code pushes.
+Object-oriented programming that is easy to use and flexible.
+Efficient, scale-out architecture instead of expensive, monolithic architecture.</code></pre>
+<p><a href="https://www.mongodb.com/scale/advantages-of-nosql" class="uri">https://www.mongodb.com/scale/advantages-of-nosql</a></p>
 <div id="load-packages" class="section level1">
 <h1><span class="header-section-number">1</span> load packages</h1>
 </div>

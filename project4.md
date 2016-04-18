@@ -1,14 +1,6 @@
----
-title: "MongoDB-ETL"
-author: "Scott Karr"
-date: "April 16, 2016"
-output: 
-  html_document: 
-    fig_caption: yes
-    keep_md: yes
-    number_sections: yes
-    toc: yes
----
+# MongoDB-ETL
+Scott Karr  
+April 16, 2016  
 This exercise walks through the process of extracting the R "flights"" database
 that was preloaded into Postgres, tranforming the data in R and loading the data
 into MongoDB.  The transformation process had performance limitions on a Mac
@@ -26,15 +18,11 @@ The principal advantages of NoSQL include being able to handle:
 https://www.mongodb.com/scale/advantages-of-nosql
 
 #load packages
-```{r load-packages,eval=TRUE, include=FALSE}
-library(rmongodb)
-library(RPostgreSQL)
-library(dplyr)
-library(knitr)
-```
+
 
 #connect to postgres flights db
-```{r conn, eval=TRUE}
+
+```r
 #assign connection parms and connect to flight db in Postgres
 dbname <- "flights"
 dbuser <- "postgres"
@@ -46,7 +34,8 @@ con <- dbConnect(drv, host=dbhost, port=dbport, dbname=dbname,user=dbuser, passw
 ```
 
 #etl flights-2-dataframes
-```{r query&fetch, eval=TRUE}
+
+```r
 #collect flights database table results
 #get airlines
 query <- dbSendQuery(
@@ -75,23 +64,62 @@ df_weather <- fetch(query,n=-1)
 dbDisconnect(con)
 ```
 
+```
+## [1] TRUE
+```
+
 #show airlines dataframe
-```{r show-airlines-from-postgres, eval=TRUE}
+
+```r
 kable(df_airlines,align='l')
 ```
 
+
+
+carrier   name                        
+--------  ----------------------------
+9E        Endeavor Air Inc.           
+AA        American Airlines Inc.      
+AS        Alaska Airlines Inc.        
+B6        JetBlue Airways             
+DL        Delta Air Lines Inc.        
+EV        ExpressJet Airlines Inc.    
+F9        Frontier Airlines Inc.      
+FL        AirTran Airways Corporation 
+HA        Hawaiian Airlines Inc.      
+MQ        Envoy Air                   
+OO        SkyWest Airlines Inc.       
+UA        United Air Lines Inc.       
+US        US Airways Inc.             
+VX        Virgin America              
+WN        Southwest Airlines Co.      
+YV        Mesa Airlines Inc.          
+
 #connect to mongodb nosql
-```{r connect, eval=TRUE}
+
+```r
 #connect to Mongo on localhost
 m <- mongo.create(host = "localhost")
 mongo.is.connected(m)
+```
+
+```
+## [1] TRUE
+```
+
+```r
 #version of MongoDB may be at issue with no data returned here!
 db <- "flights"
 mongo.get.database.collections(m, db = db)
 ```
 
+```
+## character(0)
+```
+
 #etl dataframes-2-mongodb
-```{r load2mongodb, eval=TRUE}
+
+```r
 #convert the dataframe to BSON
 b_airlines <- mongo.bson.from.df(df_airlines) 
 b_airports <- mongo.bson.from.df(df_airports) 
@@ -134,8 +162,13 @@ if (mongo.is.connected(m) == TRUE) {
 }
 ```
 
+```
+## [1] TRUE
+```
+
 #re-retrieve dataframes from mongodb
-```{r retrieve-back-from-mongodb, eval=TRUE}
+
+```r
 #get dataframes back out of mongodb
 if(mongo.is.connected(m) == TRUE) {
   #list databases
@@ -160,9 +193,31 @@ if(mongo.is.connected(m) == TRUE) {
 ```
 
 #show airlines dataframe
-```{r show-airlines-from-mongodb, eval=TRUE}
+
+```r
 # Creating many data frames embedding each of our results
 l_airlines <- lapply(c_airlines, data.frame, stringsAsFactors = FALSE)
 df_airlines <- data.frame(rbind_all(l_airlines))
 kable(df_airlines[,c(2,3)],align='l')
 ```
+
+
+
+carrier   name                        
+--------  ----------------------------
+9E        Endeavor Air Inc.           
+MQ        Envoy Air                   
+OO        SkyWest Airlines Inc.       
+UA        United Air Lines Inc.       
+US        US Airways Inc.             
+VX        Virgin America              
+WN        Southwest Airlines Co.      
+YV        Mesa Airlines Inc.          
+AA        American Airlines Inc.      
+AS        Alaska Airlines Inc.        
+B6        JetBlue Airways             
+DL        Delta Air Lines Inc.        
+EV        ExpressJet Airlines Inc.    
+F9        Frontier Airlines Inc.      
+FL        AirTran Airways Corporation 
+HA        Hawaiian Airlines Inc.      
